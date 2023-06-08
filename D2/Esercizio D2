@@ -1,0 +1,27 @@
+Essendo un grande appassionato si basket vorrei analizzare le squadre che hanno fatto le scelte migliori durante il Draft NBA:
+
+***
+Per i non addetti ai lavori:
+Il draft NBA è un evento annuale in cui le squadre della National Basketball Association (NBA) selezionano i giocatori provenienti dal college o da altre leghe. 
+Le squadre selezionano i giocatori in base all'ordine inverso della classifica della stagione precedente, con la prima scelta spettante alla squadra con il peggior record. Il draft offre alle squadre l'opportunità di migliorare la loro rosa e costruire una squadra di successo per il futuro
+***
+
+Dataset strutturati da prendere in considerazione:
+
+1) Dataset contenente le scelte al draft che abbia come attributi: "player"; "pick_number". "overall_pick"; "season" (filtro su "season" selezionando valore >= 2000); "team_name". Identificativo nel dataset cercato è il "player_id" (valore univoco per ciascun giocatore)
+
+2) Dataset contenente le statistiche dei giocatori per semplificare prendo in considerazione solamente i ppg (points per game). Attributi: "player"; "ppg". Identificativo: "team_id" (valore univoco per ciascuna squadra)
+
+3) Dataset contenente le informazioni sulle squadre di appartenenza es. record di vittorie sconfitte che comunemente viene espresso in misura %. Attributi: "team_name"; "team_record". Identificativo "team_id" 
+
+Siccome vengono effettuate 60 scelte ogni anno ed effettuare analisi su un dataset relativo agli ultimi 22 anni risulterebbe decisamente impegnativo, mi limiterei ad analizzare i giocatori selezionati nelle prime 10 posizioni del draft --> 220 giocatori
+
+Le analisi che mi piacerebbero fare sarebbero di due tipologie:
+
+1) Analizzare le performance dei giocatori selezionati da ciascuna squadra prendendo in condiderazione il parametro "ppg" e utilizzare questa metrica per individuazione delle squadre che hanno effettuato le scelte dei migliori talenti
+2) Analizzare l'impatto dei giocatori sulle performance della squadra per esempio valutando il miglioramento delle prestazioni della squadra grazie ai giocatori selezionati (variazioni del record di W/L espresso in % tra l'anno delle scelta e quello precedente) 
+
+Come dataset non strutturati prenderei in considerazione principalmente Scouting reports.
+
+1) https://bleacherreport.com/articles/10039554-2022-nba-draft-live-grades-for-every-pick). Analizzerei i voti dati dagli scout sulle scelte
+2) https://hoopshype.com/nba-scouting-reports/. Analizzerei le vautazioni su ciascun giocatore date dagli scout compresi eventuali riconoscimenti vinti durante la carriera dei giocatori
