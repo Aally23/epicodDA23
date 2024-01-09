@@ -10,10 +10,10 @@ players = pd.read_csv('mvp_votes/csv/player_stats.csv')
 del players['Rk']
 del players['Unnamed: 0']
 players['Player'] = players['Player'].str.replace('*', '', regex=False)
-players.groupby(['Player', 'Year']) 
-
+players.groupby(['Player', 'Year'])
+print(players)
 # Dobbiamo assicurarci che ogni gruppo abbia una sola riga
-def single_player_(df):
+def single_player_2(df):
     if df.shape[0] == 1:
         return df
     else:
@@ -25,92 +25,48 @@ def single_player_(df):
             df = df.loc[tot_row_index]
         return df
 
-cleaned_players = players.groupby(['Player', 'Year']).apply(single_player_).reset_index(drop=True)
+cleaned_players = players.groupby(['Player', 'Year']).apply(single_player_2).reset_index(drop=True)
 
-# Now 'cleaned_players' contains the DataFrame with the adjustments made by the single_player_2 function
 print(cleaned_players.head(20))
 
-# We don'tn need a multilevel index so we can drop it
+# Merge dei due DF
 
-# print(cleaned_players.head(20))
+combined = cleaned_players.merge(mvps, how='outer', on=['Player', 'Year']) # Non tutte le colonne, rimuovo tutti coloro che non hanno vinto l'mvp
 
-# Prova
-""" if (cleaned_players['Tm'] == 'LAL').any():
-    print(cleaned_players[cleaned_players['Tm'] == 'LAL'][['Player', 'Tm']])
-else:
-    print('Non ci sono colonne con TOT')
- """
-
-""" lb = (cleaned_players[cleaned_players['Player'] == 'LeBron James']).groupby('Tm')
-print(lb.get_group('LAL')) """
-
-
-# Merge out two DF
-
-combined = cleaned_players.merge(mvps, how='outer', on=['Player', 'Year']) # Not all of the columns. Inner mode get ride of anyone who didn't win mvp
-
-# print(combined[combined['Player'] == 'Michael Jordan']) Prova!!!
-
-# There are columns empty --> We want to replace that with 0s
+# Ci sono colonne vuote, le sostituiamo con degli 0
 combined[['Pts Won', 'Pts Max', 'Share']] = combined[['Pts Won', 'Pts Max', 'Share']].fillna(0)
-# print(combined[combined['Share'] > 0.50])
+
 
 # CLEANING TEAM DATA
 
 team_rec = pd.read_csv('mvp_votes/csv/team_records.csv')
-# print(team_rec)
-
 team_rec['Team'] = team_rec['Team'].str.replace('*', '', regex=False)
-# print(team_rec['Team'])
 del team_rec['Unnamed: 0']
-# print(team_rec)
 
-""" if (team_rec['W'] == 50).any():
-    print(team_rec.loc[team_rec['W'] == 50, ['W', 'Team', 'Year']])
-else:
-    print('NOOO') """
-
-# print(team_rec['Team'].unique())
-
-# We have the full name of the team but in the combined we have the short name of the teams
-# We need to find the way to either add the nickname into the team column or add the full team name into the combined DF
-# We will use the file nicknames.csv that matches the short and the full name of the teams
+# Abbiamo il nome completo della squadra, ma nella combinazione abbiamo il nome abbreviato delle squadre.
+# Dobbiamo trovare il modo di aggiungere il nickname nella colonna della squadra o di aggiungere il nome completo della squadra nel DF combinato.
+# Utilizzeremo il file nicknames.csv che corrisponde al nome breve e al nome completo delle squadre
 
 nicknames = {}
 
 with open('mvp_votes/csv/nicknames.csv') as f:
-    lines = f.readlines() # This is a list called lines that has all the data from our file
-    for line in lines[1:]: # Spread up the lines
-        abbrev, name = line.replace('\n', '').split(',') # Each item in this list is the abbreviation then comma then full name. We assign them to two variables
-        nicknames[abbrev] = name # We put them into the dictionary. Keay are the abbreviation and the values are the full names
-# print(nicknames)
-combined['Team'] = combined['Tm'].map(nicknames) # We create in the combined dataframe a full team name column
+    lines = f.readlines() #  Questo è un elenco chiamato lines che contiene tutti i dati del nostro file
+    for line in lines[1:]:
+        abbrev, name = line.replace('\n', '').split(',') # Ogni elemento di questa lista è costituito dall'abbreviazione, poi dalla virgola e dal nome completo. Li assegniamo a due variabili
+        nicknames[abbrev] = name  # Le inseriamo nel dizionario.
 
-""" combined.to_csv('mvp_votes/csv/check_combined.csv')
-team_rec.to_csv('mvp_votes/csv/check_team_stats.csv') """
+combined['Team'] = combined['Tm'].map(nicknames) # Creiamo nel dataframe combinato una colonna con il nome completo della squadra.
 
-""" print(combined.shape)
-print(team_rec.shape) """
-# Now we have everything we need to merge combined DF and team name DF 
+# Ora abbiamo tutto ciò che ci serve per unire il DF combinato e il DF dei nomi delle squadre.
+
 stats = combined.merge(team_rec, how='outer', on=['Team', 'Year'])
 stats = stats[stats['Player'] != 'Player']
-# print(stats)
-# print(stats.dtypes) # We have to convert them to numerical type
-# stats = stats.apply(pd.to_numeric, errors='ignore')
-# print (stats.dtypes)
 
-# print(stats['GB'].unique())  # There's dash == 0 GB, a team is in the lead
+
+# print(stats['GB'].unique())  # C'è un "—" che è uguale a dire che ci sono 0 GB ossia che una squadra è in testa
 stats['GB'] = stats['GB'].str.replace('—', '0')
-# print(stats['GB'].unique())
 
-stats = stats.apply(pd.to_numeric, errors='ignore')
-# print(stats.dtypes)
+stats = stats.apply(pd.to_numeric, errors='ignore') 
 
-# Let's write it to csv to use it in machine learning later
+# Scrivo i risultati su un csv
 stats.to_csv('mvp_votes/csv/players_mvps_stats.csv')
-
-# Let's explore this file
-
-# Who scored the most points in the alla dataset?
-highest_scoring = stats[stats['G'] > 70].sort_values('PTS', ascending=False)
-# print(highest_scoring)

@@ -30,7 +30,7 @@ predictions = pd.DataFrame(predictions, columns=['predictions'], index=test.inde
 # Possiamo confrontare i valori reali con le nostre previsioni.
 combination = pd.concat([test[['Player', 'Share']], predictions], axis=1) # We're combining the test Player and Shares columns and the predictions. On axis=1 it means we will combine the columns
 print(combination)
-print(combination.sort_values('Share', ascending=False).head(10)) # Ordianimao mettendo per primo chi ha vinto l'mvp
+print(combination.sort_values('Share', ascending=False).head(10)) # Ordiniamao mettendo per primo chi ha vinto l'mvp
 # Jokic ha vinto l'mvp ma non ha i predictors più alti di Antetokounmpo. 
 # Come valutare se questo algoritmo ha fatto un buon lavoro? Dobbiamo introdurre una metrica di errore
 
@@ -50,7 +50,6 @@ combination['Predicted_Rk'] = list(range(1, combination.shape[0] +1))
 print(combination.head(10)) # Possiamo vedere la differenza tra Rk e Predicted_rk. Ci sono alcuni valori anomali
 
 # Nuova metrica di errore: quante delle prime cinque persone nella corsa agli mvp abbiamo collocato correttamente nella top 5?
-# average_precision is the one we will use. Not so used because it deal swith rank, but it's our specific case!
 
 print(combination.sort_values('Share', ascending=False).head(10))
 
@@ -120,10 +119,6 @@ def backtest(stats, model, year, predictors):
 
 mean_ap, aps, all_predictions = backtest(stats, reg, years[5:], predictors)
 print(mean_ap) # 0.7356320654877144. L'algoritmo sembra un po' meno preciso quando si analizzano tutti i dati, ma è comunque sufficientemente preciso
-
-
-ranking = add_ranks(all_predictions[1:2]) # Predictions from 1999 season 
-# print(ranking[ranking['Rk'] < 6 ].sort_values('Diff', ascending=False)) # It gives me the top 5 MVP vote getters along with their predicted rank and difference. This is helpfull for diagnostic, we will use it later
 
 # DIAGNOSTIC
 
